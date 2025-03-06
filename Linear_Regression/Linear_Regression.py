@@ -7,16 +7,16 @@ class LinearRegression:
         self.seed=12
         self.W=None
         
-        X=args[0]
-        Y=args[1]
-        
-        try:
-            self.fit(X,Y)
-        except Exception as e:
-            print(e.with_traceback())
-        
+        if len(args)>2:
+            X=args[0]
+            Y=args[1]
+            try:
+                self.fit(X,Y)
+            except Exception as e:
+                print(f"ERROR: {e}")
+                
     def fit(self,X,Y):
-        X_i = np.c[np.ones((X.shape[0],1)),X] #Adds intercept to X so that line is more accurate
+        X_i = np.c_[np.ones((X.shape[0],1)),X] #Adds intercept to X so that line is more accurate
         np.random.seed(self.seed)
         self.W=np.random.randn(X_i.shape[1])
         
@@ -26,10 +26,22 @@ class LinearRegression:
             
             gradients = (2/len(X_i)) * X_i.T.dot(errors)
             
-            self.W = self.W - self.learning_rate * gradients
+            NEW_W = self.W - self.learning_rate * gradients
             
+            if np.any(np.isnan(NEW_W)) or np.any(np.isinf(NEW_W)):
+                print(f"NaN or Inf encountered at iteration {iteration}")
+                break
+            self.W=NEW_W
         return self
     
     def predict(self,X):
-        X = np.x_[np.ones(X.shape[0],1),X]
-        return X.dot(self.W)
+        X=np.array(X)
+        if X.ndim==0:
+            X=np.array([[X]])
+        elif X.ndim==1:
+            X=X.reshape(-1,1)
+        try:
+            X = np.c_[np.ones((X.shape[0],1)),X]
+            return X.dot(self.W)
+        except Exception as e:
+            print(f"ERROR: {e}")
