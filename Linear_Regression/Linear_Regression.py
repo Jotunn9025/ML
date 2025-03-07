@@ -15,6 +15,29 @@ class LinearRegression:
             except Exception as e:
                 print(f"ERROR: {e}")
                 
+    def process_input(self, X, Y=None, fit_mode=True):
+        X = np.asarray(X)
+        
+        if X.ndim == 0:
+            X = X.reshape(1, 1)
+
+        elif X.ndim == 1:
+            if fit_mode:
+                X = X.reshape(-1, 1)
+            else:
+                X = X.reshape(1, -1)
+        
+        if fit_mode:
+            if Y is None:
+                raise ValueError("Y cannot be None during fit.")
+            Y = np.asarray(Y)
+            if Y.ndim == 0:
+                Y = np.array([Y])
+            elif Y.ndim == 2 and Y.shape[1] == 1:
+                Y = Y.flatten()
+        
+        return X, Y            
+    
     def fit(self,X,Y):
         X_i = np.c_[np.ones((X.shape[0],1)),X] #Adds intercept to X so that line is more accurate
         np.random.seed(self.seed)
