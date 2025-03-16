@@ -35,6 +35,14 @@ class Activation:
 class tanh(Activation):
     def __init__(self):
         super().__init__(lambda x: np.tanh(x), lambda x: 1 - np.tanh(x) ** 2)
+        
+class Sigmoid(Activation):
+    def __init__(self):
+        super().__init__(
+            lambda x: 1 / (1 + np.exp(-x)),  # Sigmoid function
+            lambda x: (1 / (1 + np.exp(-x))) * (1 - (1 / (1 + np.exp(-x))))  # Derivative
+        )
+
 
 def mse(y_exp, y_pred):
     return np.mean(np.power(y_exp - y_pred, 2))
@@ -66,5 +74,5 @@ class NeuralNetwork:
                     output_der = layer.backward(output_der, learning_rate)
 
             error /= len(x_train)
-            if e % 100 == 0:
+            if e % 1 == 0:
                 print(f"Epoch {e}: Error {error}")
