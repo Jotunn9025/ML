@@ -15,7 +15,7 @@ class Layer:
         weight_der = np.dot(output_der, self.input.T)
         derE_x = np.dot(self.weights.T, output_der)
         self.weights -= learning_rate * weight_der
-        self.bias -= learning_rate * np.sum(output_der, axis=1, keepdims=True)  # Fix bias update
+        self.bias -= learning_rate * np.sum(output_der, axis=1, keepdims=True)
         return derE_x
 
 class Activation:
@@ -38,17 +38,50 @@ class tanh(Activation):
         
 class Sigmoid(Activation):
     def __init__(self):
+        def sigmoid(x):
+            return 1 / (1 + np.exp(-x))
+
+        def sigmoid_der(x):
+            s = sigmoid(x)
+            return s * (1 - s)
+
+        super().__init__(sigmoid, sigmoid_der)
+
+class ReLU(Activation):#leads to lots of NaNs(avoid)
+    def __init__(self):
         super().__init__(
-            lambda x: 1 / (1 + np.exp(-x)),  # Sigmoid function
-            lambda x: (1 / (1 + np.exp(-x))) * (1 - (1 / (1 + np.exp(-x))))  # Derivative
+            lambda x: np.maximum(0, x),
+            lambda x: (x > 0).astype(float)
         )
-
-
+        
+class Softmax():
+    def __init__(self,one_true=False):
+        self.input = None
+        self.output = None
+        self.one_true=one_true
+    def forward(self,input):
+        exp=np.exp(input-np.max(input))
+        self.output=exp/np.sum(exp)
+        return self.output
+    def backward(self,output_der,learning_rate):
+        if( not self.one_true):
+            n = np.size(self.output)
+            return np.dot((np.identity(n) - self.output.T) * self.output, output_der)
+        else:
+            return output_der
+    
 def mse(y_exp, y_pred):
     return np.mean(np.power(y_exp - y_pred, 2))
 
 def mse_der(y_exp, y_pred):
     return 2 * (y_pred - y_exp) / np.size(y_exp)
+
+def cross_entropy(y_true, y_pred):
+    y_pred = np.clip(y_pred, 1e-12, 1.0)  # make 0 int 1e-12 so no log 0
+    return -np.sum(y_true * np.log(y_pred)) / y_true.shape[1]
+
+def cross_entropy_der(y_true, y_pred):
+    return y_pred - y_true
 
 class NeuralNetwork:
     def __init__(self, *args):
