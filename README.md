@@ -39,11 +39,10 @@ python Test.py
 
 ### 2. Neural Networks
 - Implemented a basic **neural network** (not convolutional yet)
-- Uses **Mean Squared Error (MSE)** loss function, making it unsuitable for multi-class classification problems
+- Uses **Mean Squared Error (MSE)** loss function for regression problems and **Cross-Entropy** loss function for classification problems
 - Works great for predicting **XOR**
-- Supports **tanh** and **sigmoid** activation functions
-- Plans to add **Cross Entropy Loss** to ensure we can solve a wider range of problems such as **multi-class classification**
-- Future additions include **ReLU, Leaky ReLU, and Softmax** and a notebook explaining learnings
+- Supports **tanh, sigmoid, ReLU, SoftMax** activation functions
+- Future additions include **Leaky ReLU, MISH** and a notebook explaining learnings
 
 ## Future Plans
 - Add more machine learning algorithms (e.g., logistic regression, decision trees, convolutional neural networks)
