@@ -1,5 +1,5 @@
 import numpy as np
-
+import matplotlib.pyplot as plt
 class Layer:
     def __init__(self, input_size, output_size):
         self.input = None
@@ -109,3 +109,78 @@ class NeuralNetwork:
             error /= len(x_train)
             if e % 1 == 0:
                 print(f"Epoch {e}: Error {error}")
+    def train_with_accuracy(self, loss, loss_der, x_train, y_train,x_test,y_test, epochs=1000, learning_rate=0.01):
+        losses=[]
+        accuracy=[]
+        accuracies_test=[]
+        for e in range(epochs):
+            error = 0
+            for x, y in zip(x_train, y_train):
+                output = self.predict(x)
+                error += loss(y, output)
+                output_der = loss_der(y, output)
+                
+                for layer in reversed(self.network):
+                    output_der = layer.backward(output_der, learning_rate)
+
+            error /= len(x_train)
+            if e % 1 == 0:
+                print(f"Epoch {e}: Error {error}")
+            losses.append(error)
+            
+            error_total = 0
+            correct = 0
+            total = len(x_test)
+
+            for i in range(total):
+                output = self.predict(x_test[i])
+                error_total += loss(y_test[i], output)
+                pred_digit = int(np.argmax(output))
+                true_digit = int(np.argmax(y_test[i]))
+                if pred_digit == true_digit:
+                    correct += 1
+
+            avg_error = error_total / total
+            accuracies = correct / total 
+            accuracy.append(accuracies)
+            #for train data
+            error_total = 0
+            correct = 0
+            total = len(x_train)
+
+            for i in range(total):
+                output = self.predict(x_train[i])
+                error_total += loss(y_train[i], output)
+                pred_digit = int(np.argmax(output))
+                true_digit = int(np.argmax(y_train[i]))
+                if pred_digit == true_digit:
+                    correct += 1
+
+            avg_error = error_total / total
+            accuracies = correct / total 
+            accuracies_test.append(accuracies)
+            print(losses[-1],accuracy[-1],accuracies_test[-1])
+        fig, axs = plt.subplots(1, 2, figsize=(14, 6))
+
+        axs[0].plot( losses, label="Loss", color="blue")
+        axs[0].plot( accuracies_test, label="Test Accuracy", color="green")
+        axs[0].set_xlabel("Epoch")
+        axs[0].set_ylabel("Value")
+        axs[0].set_title("Loss and Test Accuracy over Epochs")
+        axs[0].legend()
+        axs[0].grid(True)
+
+        axs[1].plot( accuracy, label="Test Accuracy", color="orange")
+        axs[1].plot( accuracies_test, label="Train Accuracy", color="green")
+        axs[1].set_xlabel("Epoch")
+        axs[1].set_ylabel("Accuracy")
+        axs[1].set_title("Train vs Test Accuracy over Epochs")
+        axs[1].legend()
+        axs[1].grid(True)
+
+        plt.tight_layout()
+
+        plt.show()
+
+
+            

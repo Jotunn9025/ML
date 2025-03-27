@@ -51,7 +51,7 @@ X_test,Y_test,X_train,Y_train=X_test/255,Y_test,X_train/255,Y_train
 nn2 = NN.NeuralNetwork(
     NN.Layer(784, 150),
     NN.tanh(),
-    NN.Layer(150, 28), 
+    NN.Layer(150, 28),
     NN.tanh(),
     NN.Layer(28, 10), 
     NN.Softmax(one_true=True)
@@ -59,7 +59,7 @@ nn2 = NN.NeuralNetwork(
 )
 
 
-nn2.train(NN.cross_entropy, NN.cross_entropy_der, X_train, Y_train, epochs=20, learning_rate=0.01)
+nn2.train_with_accuracy(NN.cross_entropy, NN.cross_entropy_der, X_train, Y_train,X_test,Y_test, epochs=10, learning_rate=0.01)
 
 error_total = 0
 correct = 0
